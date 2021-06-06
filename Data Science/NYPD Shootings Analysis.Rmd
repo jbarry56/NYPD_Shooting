@@ -1,0 +1,66 @@
+---
+title: "New York Shootings"
+author: "James Barry"
+date: "5/22/2021"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = FALSE,
+	warning = FALSE
+)
+```
+
+## R Markdown
+
+The following project will go into analysis surrounding shooting incidents in New York City. The data is collected from https://catalog.data.gov/dataset.
+
+
+The below code reads in the NYPD shooting data in a  reproducible way. The OCCUR_DATE variable is changed to a date variable. Columns I will not be using and removed include Longitude,Latitude,Lon_Lat,Y_COORD_CD, and X_COORD_CD. Three bar graphs are created using ggplot that are helpful analyzing the categorical variables. Analysis focuses on the victims since the data is not complete for the perpetrators. The missing data is not an issue for the purpose of this analysis, but I would remove blank rows if looking at the perpetrator. It is also most likely more accurate data since the victims of shootings are more easily identifiable. The summary shows the data included.
+
+```{r Graph 1}
+library(tidyverse)
+library(lubridate)
+library(dplyr)
+url_in <- "https://catalog.data.gov/dataset"
+file_names <- "https://data.cityofnewyork.us/api/views/833y-fsy8/rows.csv?accessType=DOWNLOAD"  
+urls <- str_c(file_names)
+NYPD_Shootings <- read_csv(urls[1])
+
+
+NYPD_Shootings <- NYPD_Shootings %>%
+  mutate(OCCUR_DATE = mdy(OCCUR_DATE)) %>%
+  select (-c(Longitude,Latitude,Lon_Lat,Y_COORD_CD,X_COORD_CD,))
+
+summary(NYPD_Shootings)
+```
+
+**Graph 1 - Shootings By Boro**
+```{r graph 1}
+#Visuals
+p<-ggplot(data=NYPD_Shootings, aes(x=BORO)) + geom_bar(fill ="blue", color ="black")
+p
+```
+
+**Graph 2 - Shooting Victims by Age**
+```{r Graph 2}
+p<-ggplot(data=NYPD_Shootings, aes(x=VIC_AGE_GROUP)) + geom_bar(fill ="blue", color ="black")
+p
+```
+
+**Graph 3 - Shootings by Sex**
+```{r Graph 3}
+p<-ggplot(data=NYPD_Shootings, aes(x=VIC_SEX)) + geom_bar(fill ="blue", color ="black")
+p
+```
+
+**Analysis**
+Graph 1 shows the Brooklyn has the highest total number of shooting incidents. These numbers are *especially* interesting when looking at the population. Brooklyn has around 2.6 million people compared to Queens which only has a population of around 2.3 million. This shows that Brooklyn has signigantly higher shooting rate with more than double. Graph 2 shows the age group that is most likely to be a victim of a shooting is ages 18-44. 18-24 is especially high.Graph 3 shows that males are the victims of shootings far more than females. Since I only looked at the victim profile, it would be interesting to see if the perpertrator profile was shared any similarities. If it lined up with the victim profile or was different. Also looking further into the Brooklyn Boro would be interesting because the incident rate is so high. 
+
+**Conclusion**
+The overall takeaway of the above analysis is the likelihood of being a victim of a shooting in New York City. The most common is in Brooklyn for males between the age of 18-24. To avoid bias I graphed variables and then looked at the data. A source of bias could include only focusing on the victims. Assuming the shooter has the same profile is not necesarily the case and should be looked into further. 
